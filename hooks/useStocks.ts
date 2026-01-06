@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { Alert } from 'react-native';
 import { Stock } from '../types';
+import { Alert } from '../utils/alert';
 import { Database } from '../services/database';
 import { updateAllStockPrices } from '../services/stockApi';
 import { useAppContext } from '../contexts/AppContext';

@@ -27,6 +27,8 @@ export default function WelcomeScreen({ onClose }: WelcomeScreenProps) {
   }, []);
 
   const handleClose = () => {
+    console.log('WelcomeScreen: Close button pressed');
+    
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -39,8 +41,15 @@ export default function WelcomeScreen({ onClose }: WelcomeScreenProps) {
         useNativeDriver: true,
       }),
     ]).start(() => {
+      console.log('WelcomeScreen: Animation completed, calling onClose');
       onClose();
     });
+    
+    // Timeout de seguridad por si la animación falla
+    setTimeout(() => {
+      console.log('WelcomeScreen: Safety timeout triggered');
+      onClose();
+    }, 800);
   };
 
   return (

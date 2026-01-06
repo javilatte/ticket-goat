@@ -1,7 +1,10 @@
 // Yahoo Finance API - Completely free, no API key required
 const YAHOO_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance';
+// CORS proxy for web browsers
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 import { Stock } from '../types';
+import { Platform } from 'react-native';
 
 export interface StockPrice {
   symbol: string;
@@ -26,9 +29,11 @@ export interface StockChartData {
  */
 export async function fetchStockPrice(symbol: string): Promise<StockPrice> {
   try {
-    const response = await fetch(
-      `${YAHOO_BASE_URL}/chart/${symbol.toUpperCase()}?interval=1d&range=1d`
-    );
+    // En web, usar proxy CORS para evitar problemas de CORS
+    const url = `${YAHOO_BASE_URL}/chart/${symbol.toUpperCase()}?interval=1d&range=1d`;
+    const finalUrl = Platform.OS === 'web' ? `${CORS_PROXY}${encodeURIComponent(url)}` : url;
+    
+    const response = await fetch(finalUrl);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -100,9 +105,11 @@ export async function updateAllStockPrices(stocks: Stock[]): Promise<Stock[]> {
  */
 export async function fetchStockHistory(symbol: string, days: number = 30): Promise<StockChartData> {
   try {
-    const response = await fetch(
-      `${YAHOO_BASE_URL}/chart/${symbol.toUpperCase()}?interval=1d&range=${days}d`
-    );
+    // En web, usar proxy CORS para evitar problemas de CORS
+    const url = `${YAHOO_BASE_URL}/chart/${symbol.toUpperCase()}?interval=1d&range=${days}d`;
+    const finalUrl = Platform.OS === 'web' ? `${CORS_PROXY}${encodeURIComponent(url)}` : url;
+    
+    const response = await fetch(finalUrl);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

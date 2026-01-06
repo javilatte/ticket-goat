@@ -73,7 +73,8 @@ function AppContent() {
     if (fontsLoaded) {
       loadData();
     }
-  }, [fontsLoaded, loadData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fontsLoaded]);
 
   // Handlers
   const handleAddTransaction = () => {

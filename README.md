@@ -23,11 +23,13 @@
 > **This application is currently in BETA and under active development.**
 > 
 > ### 🔐 Data Security
-> - All data is stored **locally on your device** using AsyncStorage, which is **NOT encrypted by default**
-> - You are responsible for the security of your device and data
-> - We recommend using device encryption and strong device passwords/biometrics
-> - The optional encryption feature is available but must be manually enabled
+> - All data is stored **locally on your device** with **AES encryption enabled by default**
+> - Data is encrypted using industry-standard AES encryption via CryptoJS
+> - Encryption keys are securely stored using Expo SecureStore (Keychain on iOS, KeyStore on Android)
+> - You are responsible for maintaining device backups (uninstalling the app will lose the encryption key)
+> - Exported Excel/CSV files are **NOT encrypted** - protect them appropriately
 > - **No warranty is provided** regarding data loss, corruption, or unauthorized access
+> - See [SECURITY.md](SECURITY.md) for detailed security information
 > 
 > ### 📊 Stock Price Accuracy
 > - Stock prices are fetched from **Yahoo Finance API** for informational purposes only
@@ -72,6 +74,7 @@
 - **CSV Export** - Universal format for data analysis
 - **Import Support** - Restore data from Excel/CSV backups
 - **Local Storage** - All data stays on your device
+- **🔒 AES Encryption** - All data encrypted by default using AES with SecureStore keys
 
 ### 🎨 Modern UI/UX
 - **Dark Theme** - Easy on the eyes with a sleek dark interface

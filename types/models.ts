@@ -1,6 +1,7 @@
 /**
  * Financial transaction record
  * Represents an income or expense transaction
+ * Note: All data is automatically encrypted with AES before storage
  */
 export interface Transaction {
   id?: string;
@@ -11,7 +12,6 @@ export interface Transaction {
   categoryColor?: string;
   date: string;
   createdAt: string;
-  encrypted?: boolean;
   accountId: string;
   isPayroll?: boolean;
 }
@@ -52,9 +52,10 @@ export interface Balance {
 
 /**
  * Application settings and preferences
+ * Note: encryptionEnabled is always true and cannot be disabled
  */
 export interface Settings {
-  encryptionEnabled: boolean;
+  encryptionEnabled: boolean; // Always true, kept for backward compatibility
   currency: string;
   periodFilter: 'month' | 'payroll';
   hideBalances: boolean;

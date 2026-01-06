@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { Alert } from 'react-native';
 import { Account, Transaction } from '../types';
+import { Alert } from '../utils/alert';
 import { Database } from '../services/database';
 import { useAppContext } from '../contexts/AppContext';
 
@@ -14,6 +14,7 @@ export function useAccounts() {
     accounts, 
     setAccounts,
     transactions,
+    setTransactions,
     setShowEditAccountModal,
     setEditingAccount,
     setShowAccountModal
@@ -68,47 +69,72 @@ export function useAccounts() {
     const account = accounts.find(a => a.id === accountId);
     if (!account) return;
 
-    // Calcular diferencia de balance si cambió
-    const newBalance = updates.currentBalance ?? account.currentBalance;
+    // Obtener transacciones actuales de la cuenta
+    const allTxs = await Database.getTransactions();
+    const accountTxs = allTxs.filter(t => t.accountId === accountId);
+    
+    // Calcular balance basado en transacciones
+    const income = accountTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const expense = accountTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    
+    // Determinar el nuevo initialBalance (puede haber cambiado)
+    const newInitialBalance = updates.initialBalance ?? account.initialBalance;
+    
+    // Calcular el balance que DEBERÍA tener con el nuevo initialBalance
+    const calculatedBalance = newInitialBalance + income - expense;
+    
+    // Balance que el usuario quiere (puede haber editado manualmente)
+    const desiredBalance = updates.currentBalance ?? account.currentBalance;
+    
+    // Si el usuario cambió manualmente el balance actual, crear transacción de ajuste
     const oldBalance = updates.oldCurrentBalance ?? account.currentBalance;
-    const difference = newBalance - oldBalance;
-
-    // Si hubo cambio en el balance, crear transacción de reajuste
-    if (difference !== 0) {
-      const adjustmentTransaction: Transaction = {
-        type: difference > 0 ? 'income' : 'expense',
-        amount: Math.abs(difference),
-        description: 'Reajuste Manual',
-        category: 'Ajuste',
-        categoryColor: '#8B5CF6',
-        date: new Date().toLocaleString('es-ES', { 
-          day: '2-digit', 
-          month: '2-digit', 
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false 
-        }).replace(',', ''),
-        createdAt: new Date().toISOString(),
-        accountId: accountId,
-        isPayroll: false
-      };
-      await Database.addTransaction(adjustmentTransaction);
+    
+    // Solo crear ajuste si:
+    // 1. El usuario cambió manualmente el currentBalance (desiredBalance !== oldBalance)
+    // 2. Y ese cambio no es simplemente el resultado de cambiar el initialBalance
+    const manualAdjustment = desiredBalance - oldBalance;
+    const initialBalanceChange = newInitialBalance - account.initialBalance;
+    const needsAdjustment = manualAdjustment !== 0 && manualAdjustment !== initialBalanceChange;
+    
+    if (needsAdjustment) {
+      const adjustmentAmount = desiredBalance - calculatedBalance;
+      if (adjustmentAmount !== 0) {
+        const adjustmentTransaction: Transaction = {
+          type: adjustmentAmount > 0 ? 'income' : 'expense',
+          amount: Math.abs(adjustmentAmount),
+          description: 'Reajuste Manual',
+          category: 'Ajuste',
+          categoryColor: '#8B5CF6',
+          date: new Date().toLocaleString('es-ES', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false 
+          }).replace(',', ''),
+          createdAt: new Date().toISOString(),
+          accountId: accountId,
+          isPayroll: false
+        };
+        await Database.addTransaction(adjustmentTransaction);
+      }
     }
 
-    // Actualizar nombre, IBAN, initialBalance y color
+    // Actualizar cuenta (nombre, IBAN, initialBalance, color)
     const { currentBalance, oldCurrentBalance, ...accountUpdates } = updates;
     if (Object.keys(accountUpdates).length > 0) {
       await Database.updateAccount(accountId, accountUpdates);
     }
     
-    // Recargar cuentas con balances recalculados
+    // Recargar transacciones y cuentas con balances recalculados
     const txs = await Database.getTransactions();
+    setTransactions(txs);
     await loadAccounts(txs);
     
     setShowEditAccountModal(false);
     setEditingAccount(null);
-  }, [accounts, loadAccounts, setShowEditAccountModal, setEditingAccount]);
+  }, [accounts, loadAccounts, setTransactions, setShowEditAccountModal, setEditingAccount]);
 
   const deleteAccount = useCallback(async (accountId: string) => {
     try {
