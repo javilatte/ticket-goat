@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Alert } from '../utils/alert';
 import { styles } from '../styles/modal.styles';
 import { Stock } from '../services/database';
 import { fetchStockPrice } from '../services/stockApi';
@@ -67,20 +68,14 @@ export default function StockModal({
 
   const handleDelete = () => {
     if (stock && onDelete) {
-      Alert.alert(
+      const { confirmAsync } = require('../utils/alert');
+      confirmAsync(
         'Eliminar Stock',
         `¿Eliminar ${stock.symbol}?`,
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          {
-            text: 'Eliminar',
-            style: 'destructive',
-            onPress: () => {
-              onDelete(stock.id);
-              handleClose();
-            }
-          }
-        ]
+        () => {
+          onDelete(stock.id);
+          handleClose();
+        }
       );
     }
   };
@@ -108,7 +103,8 @@ export default function StockModal({
       if (!name.trim()) {
         setName(priceData.symbol);
       }
-      Alert.alert('Éxito', `Precio actualizado: $${priceData.price}`);
+      // No mostrar alert de éxito para evitar que el modal se cierre en web
+      // El precio actualizado es visible en el input
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Error al obtener el precio');
     } finally {
@@ -174,9 +170,9 @@ export default function StockModal({
           />
 
           <Text style={styles.inputLabel}>Precio actual</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'stretch', marginBottom: 12 }}>
             <TextInput
-              style={[styles.input, { flex: 1, marginRight: 10 }]}
+              style={[styles.input, { flex: 1, marginRight: 10, marginBottom: 0 }]}
               placeholder="160.00"
               placeholderTextColor="#999"
               keyboardType="numeric"
@@ -192,17 +188,18 @@ export default function StockModal({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 48,
+                borderWidth: 1,
+                borderColor: '#10B981',
               }}
               onPress={handleFetchPrice}
               disabled={loadingPrice}
             >
               {loadingPrice ? (
-                <ActivityIndicator color="#FFF" />
+                <ActivityIndicator color="#FFF" size="small" />
               ) : (
                 <>
-                  <MaterialIcons name="refresh" size={18} color="#FFF" />
-                  <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 14, marginLeft: 5 }}>
+                  <MaterialIcons name="refresh" size={16} color="#FFF" />
+                  <Text style={{ color: '#FFF', fontWeight: '600', fontSize: 13, marginLeft: 4 }}>
                     Actualizar
                   </Text>
                 </>

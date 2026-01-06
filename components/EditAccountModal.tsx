@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Alert } from '../utils/alert';
 import { styles } from '../styles/modal.styles';
 import { Account } from '../services/database';
 
@@ -54,23 +55,14 @@ export default function EditAccountModal({
 
   const handleDelete = () => {
     if (account) {
-      Alert.alert(
+      const { confirmAsync } = require('../utils/alert');
+      confirmAsync(
         'Eliminar Cuenta',
         `¿Eliminar la cuenta "${account.name}"? Esta acción no se puede deshacer.`,
-        [
-          {
-            text: 'Cancelar',
-            style: 'cancel'
-          },
-          {
-            text: 'Eliminar',
-            style: 'destructive',
-            onPress: () => {
-              onDelete(account.id);
-              onClose();
-            }
-          }
-        ]
+        () => {
+          onDelete(account.id);
+          onClose();
+        }
       );
     }
   };

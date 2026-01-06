@@ -111,8 +111,15 @@ export default function SettingsScreen({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Exportar Datos</Text>
           
+          <View style={styles.warningBox}>
+            <MaterialIcons name="lock-open" size={20} color="#F59E0B" />
+            <Text style={styles.warningText}>
+              Los archivos exportados NO están cifrados. Protégelos adecuadamente.
+            </Text>
+          </View>
+          
           <TouchableOpacity
-            style={styles.exportButton}
+            style={[styles.exportButton, { marginTop: 20 }]}
             onPress={onExportExcel}
           >
             <MaterialIcons name="table-chart" size={24} color="#FFFFFF" />
@@ -150,7 +157,25 @@ export default function SettingsScreen({
           <View style={styles.infoBox}>
             <MaterialIcons name="info" size={20} color="#6B7C4F" />
             <Text style={styles.infoText}>
-              Los datos importados se añadirán a los existentes. Usa el formato de exportación de esta app.
+              Los datos importados se cifran automáticamente y se añaden a los existentes. Usa el formato de exportación de esta app.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Seguridad</Text>
+          
+          <View style={styles.infoBox}>
+            <MaterialIcons name="lock" size={20} color="#10B981" />
+            <Text style={styles.infoText}>
+              🔒 Cifrado AES activado por defecto. Todos tus datos están protegidos con cifrado de nivel bancario.
+            </Text>
+          </View>
+          
+          <View style={styles.warningBox}>
+            <MaterialIcons name="warning" size={20} color="#F59E0B" />
+            <Text style={styles.warningText}>
+              Mantén backups del dispositivo. Si desinstalas la app, perderás la clave de cifrado y no podrás recuperar los datos.
             </Text>
           </View>
         </View>

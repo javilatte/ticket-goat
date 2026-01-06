@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { Alert } from 'react-native';
 import { Transaction } from '../types';
+import { Alert } from '../utils/alert';
 import { Database } from '../services/database';
 import { useAppContext } from '../contexts/AppContext';
 
@@ -85,22 +85,16 @@ export function useTransactions() {
   }, [formData, editingTransaction, accounts, setShowModal, setEditingTransaction, setFormData, loadTransactions, updateBalance]);
 
   const deleteTransaction = useCallback(async (id: string) => {
-    Alert.alert(
+    const { confirmAsync } = await import('../utils/alert');
+    confirmAsync(
       'Confirmar',
       '¿Eliminar esta transacción?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
-          style: 'destructive',
-          onPress: async () => {
-            await Database.deleteTransaction(id);
-            const txs = await loadTransactions();
-            const bal = await Database.getBalance();
-            await updateBalance(txs, bal);
-          }
-        }
-      ]
+      async () => {
+        await Database.deleteTransaction(id);
+        const txs = await loadTransactions();
+        const bal = await Database.getBalance();
+        await updateBalance(txs, bal);
+      }
     );
   }, [loadTransactions, updateBalance]);
 

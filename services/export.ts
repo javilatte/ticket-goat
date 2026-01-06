@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
-import { Platform, Alert } from 'react-native';
+import { Platform } from 'react-native';
+import { Alert } from '../utils/alert';
 import { Database, Transaction, Account, Stock } from './database';
 import * as DocumentPicker from 'expo-document-picker';
 
