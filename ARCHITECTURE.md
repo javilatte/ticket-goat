@@ -3,7 +3,7 @@
 ## Estructura del Proyecto
 
 ```
-ticket-goat-mobile/
+ticket-goat/
 ├── types/              # Tipos TypeScript centralizados
 │   ├── models.ts       # Interfaces de datos (Transaction, Account, Stock, etc.)
 │   └── index.ts        # Barrel export

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "TicketGOAT",
-    "slug": "ticket-goat-mobile",
+    "slug": "ticket-goat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

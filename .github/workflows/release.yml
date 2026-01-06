@@ -3,7 +3,7 @@ name: Build and Release APK
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 permissions:
@@ -136,7 +136,7 @@ jobs:
             
             ### 📋 What's New
             
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for detailed changes.
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for detailed changes.
             
             ### 🔧 Features
             

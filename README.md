@@ -93,8 +93,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/javilatte/ticket-goat-mobile.git
-   cd ticket-goat-mobile
+   git clone https://github.com/javilatte/ticket-goat.git
+   cd ticket-goat
    ```
 
 2. **Install dependencies**
@@ -162,7 +162,7 @@
 ## 🏗 Project Structure
 
 ```
-ticket-goat-mobile/
+ticket-goat/
 ├── assets/                 # Images, fonts, and static files
 ├── components/             # React components
 │   ├── Dashboard.tsx
@@ -259,7 +259,7 @@ docker run -d -p 8000:8000 ticketgoat-ocr
 
 ### Android
 
-Download the latest APK from the [Releases page](https://github.com/javilatte/ticket-goat-mobile/releases/latest).
+Download the latest APK from the [Releases page](https://github.com/javilatte/ticket-goat/releases/latest).
 
 1. Download `TicketGOAT-vX.X.X.apk`
 2. Enable "Install from Unknown Sources" in your device settings
@@ -326,8 +326,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/javilatte/ticket-goat-mobile/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/javilatte/ticket-goat-mobile/discussions)
+- **Issues**: [GitHub Issues](https://github.com/javilatte/ticket-goat/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/javilatte/ticket-goat/discussions)
 
 ---
 

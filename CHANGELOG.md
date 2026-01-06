@@ -89,4 +89,4 @@ Para vulnerabilidades de seguridad.
 
 ---
 
-[1.0.0]: https://github.com/javilatte/ticket-goat-mobile/releases/tag/v1.0.0
+[1.0.0]: https://github.com/javilatte/ticket-goat/releases/tag/v1.0.0
