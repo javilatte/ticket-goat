@@ -255,6 +255,25 @@ docker run -d -p 8000:8000 ticketgoat-ocr
 
 ---
 
+## 📥 Download & Installation
+
+### Android
+
+Download the latest APK from the [Releases page](https://github.com/javilatte/ticket-goat-mobile/releases/latest).
+
+1. Download `TicketGOAT-vX.X.X.apk`
+2. Enable "Install from Unknown Sources" in your device settings
+3. Open the APK file and install
+4. Open TicketGOAT and start tracking your finances!
+
+> **Note**: iOS support coming soon.
+
+### Build from Source
+
+See [Getting Started](#getting-started) section for development setup instructions.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:

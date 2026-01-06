@@ -26,11 +26,16 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      "usesCleartextTraffic": true,
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.INTERNET"
+      ],
+      "package": "com.javilatte.ticketgoatmobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -45,6 +50,11 @@
       ],
       "expo-secure-store",
       "expo-audio"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f1552cb6-ef59-48e0-a7d6-80f5841f7fc1"
+      }
+    }
   }
 }
