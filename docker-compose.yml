@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Aplicación Web
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+      - OCR_SERVICE_URL=http://ocr:8000
+    depends_on:
+      - ocr
+    networks:
+      - ticketgoat
+    restart: unless-stopped
+
+  # Servicio OCR
+  ocr:
+    build:
+      context: ./ocr-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - ticketgoat
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  ticketgoat:
+    driver: bridge
+
+volumes:
+  ocr_cache:

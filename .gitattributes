@@ -1,0 +1,35 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# Config files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.eslintrc.json text eol=lf
+.prettierrc text eol=lf
+tsconfig.json text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.woff binary
+*.woff2 binary

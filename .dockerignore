@@ -1,0 +1,15 @@
+ocr-service/.dockerignore
+ocr-service/__pycache__/
+ocr-service/*.pyc
+ocr-service/.pytest_cache/
+ocr-service/.venv/
+node_modules/
+.expo/
+.expo-shared/
+dist/
+.git/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
