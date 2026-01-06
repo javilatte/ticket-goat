@@ -13,6 +13,11 @@
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
   
   [Features](#features) • [Getting Started](#getting-started) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Contributing](#contributing)
+
+  <div align="center">
+  <img src="https://ticketgoat.jagoan.es/sc2-portrait.png" alt="Dashboard" width="300">
+  
+  </div>
   
 </div>
 
