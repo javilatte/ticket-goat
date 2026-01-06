@@ -8,112 +8,161 @@ on:
 
 jobs:
   build:
-    name: Build APK and Create Release
+    name: Build and Publish APK
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: 🔧 Install dependencies
         run: npm ci
 
-      - name: Setup Expo
+      - name: 🏗️ Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build APK with EAS
-        run: |
-          eas build --platform android --profile preview --non-interactive --no-wait
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Wait for build completion
-        id: wait_build
-        run: |
-          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-          
-          while true; do
-            STATUS=$(eas build:view $BUILD_ID --json | jq -r '.status')
-            echo "Build status: $STATUS"
-            
-            if [ "$STATUS" == "finished" ]; then
-              echo "Build completed successfully!"
-              APK_URL=$(eas build:view $BUILD_ID --json | jq -r '.artifacts.buildUrl')
-              echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
-              break
-            elif [ "$STATUS" == "errored" ] || [ "$STATUS" == "canceled" ]; then
-              echo "Build failed with status: $STATUS"
-              exit 1
-            fi
-            
-            sleep 30
-          done
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Download APK
-        run: |
-          curl -L -o TicketGOAT.apk "${{ steps.wait_build.outputs.apk_url }}"
-          ls -lh TicketGOAT.apk
-
-      - name: Get version from package.json
+      - name: 📝 Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+          echo "📱 Version: v$VERSION"
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: 🚀 Build APK with EAS (and wait)
+        id: build
+        run: |
+          echo "Starting EAS Build (this will take 10-20 minutes)..."
+          
+          # Start build and capture output
+          eas build --platform android --profile preview --non-interactive --wait > build_output.txt 2>&1 || true
+          
+          # Display output
+          cat build_output.txt
+          
+          # Extract build URL from output
+          BUILD_URL=$(cat build_output.txt | grep -o 'https://expo.dev/accounts/[^/]*/projects/[^/]*/builds/[a-f0-9-]*' | head -1)
+          echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
+          echo "📊 Build URL: $BUILD_URL"
+          
+          # Get build ID
+          BUILD_ID=$(echo "$BUILD_URL" | grep -o '[a-f0-9-]*$')
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "🆔 Build ID: $BUILD_ID"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📥 Get APK download URL
+        id: apk
+        run: |
+          # List recent builds and get the artifact URL
+          echo "Fetching build artifact URL..."
+          
+          # Get build details
+          BUILD_ID="${{ steps.build.outputs.build_id }}"
+          
+          # Try to get artifact URL from EAS CLI
+          eas build:view $BUILD_ID > build_details.txt 2>&1 || true
+          cat build_details.txt
+          
+          # Extract download URL from output
+          APK_URL=$(cat build_details.txt | grep -i "download" | grep -o 'https://[^[:space:]]*' | head -1)
+          
+          # If not found, try alternative pattern
+          if [ -z "$APK_URL" ]; then
+            APK_URL=$(cat build_details.txt | grep -o 'https://[^[:space:]]*\.apk[^[:space:]]*' | head -1)
+          fi
+          
+          # If still not found, construct URL pattern (Expo's typical format)
+          if [ -z "$APK_URL" ]; then
+            echo "⚠️ Could not extract URL from CLI output, checking Expo API..."
+            # Fallback: The artifact is usually available at the build details page
+            echo "Build details available at: ${{ steps.build.outputs.build_url }}"
+            # We'll need to use expo's API or manual intervention
+            exit 1
+          fi
+          
+          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+          echo "📦 APK URL: $APK_URL"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 💾 Download APK
+        run: |
+          echo "Downloading APK..."
+          APK_URL="${{ steps.apk.outputs.apk_url }}"
+          
+          # Download with curl
+          curl -L -o TicketGOAT.apk "$APK_URL"
+          
+          # Verify download
+          if [ -f TicketGOAT.apk ]; then
+            SIZE=$(ls -lh TicketGOAT.apk | awk '{print $5}')
+            echo "✅ APK downloaded successfully: $SIZE"
+            ls -lh TicketGOAT.apk
+          else
+            echo "❌ Failed to download APK"
+            exit 1
+          fi
+
+      - name: 🏷️ Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          release_name: TicketGOAT v${{ steps.version.outputs.version }}
+          name: TicketGOAT v${{ steps.version.outputs.version }}
           body: |
-            ## TicketGOAT v${{ steps.version.outputs.version }}
+            ## 🎉 TicketGOAT v${{ steps.version.outputs.version }}
             
-            ### Instalación
-            Descarga el APK adjunto e instálalo en tu dispositivo Android.
+            ### 📱 Installation
             
-            > ⚠️ **Nota:** Debes habilitar la instalación desde fuentes desconocidas en la configuración de tu dispositivo.
+            1. Download `TicketGOAT-v${{ steps.version.outputs.version }}.apk` below
+            2. Enable "Install from Unknown Sources" in your Android device settings
+            3. Open the APK file and install
+            4. Enjoy tracking your finances!
             
-            ### Cambios
-            Ver [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) para detalles completos.
+            ### 📋 What's New
+            
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for detailed changes.
+            
+            ### 🔧 Features
+            
+            - 💰 Transaction tracking with categories
+            - 🏦 Multiple account management
+            - 📈 Stock portfolio with real-time prices
+            - 🎫 OCR receipt scanning (optional)
+            - 📊 Excel/CSV import & export
             
             ---
             
-            **Build ID:** ${{ steps.wait_build.outputs.build_id }}
-            **Commit:** ${{ github.sha }}
+            **Build ID:** `${{ steps.build.outputs.build_id }}`  
+            **Build URL:** ${{ steps.build.outputs.build_url }}  
+            **Commit:** `${{ github.sha }}`  
+            **Built:** ${{ github.event.head_commit.timestamp }}
+          files: TicketGOAT.apk
           draft: false
           prerelease: false
-
-      - name: Upload APK to Release
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./TicketGOAT.apk
-          asset_name: TicketGOAT-v${{ steps.version.outputs.version }}.apk
-          asset_content_type: application/vnd.android.package-archive
 
-      - name: Build complete
+      - name: ✅ Success Summary
         run: |
-          echo "Release created successfully!"
-          echo "APK: TicketGOAT-v${{ steps.version.outputs.version }}.apk"
-          echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
+          echo "### 🎉 Release Published Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL:** ${{ steps.create_release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**📦 APK is now available for download:**" >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ github.repository }}/releases/latest" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Users can now download and install the app!"
