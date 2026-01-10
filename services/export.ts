@@ -271,12 +271,8 @@ export class ExportService {
     ).join('\n');
   }
 
-  private static binaryToBase64(binary: string): string {
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    // Convertir a base64 manualmente
+  private static bufferToBase64(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
     let base64 = '';
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     for (let i = 0; i < bytes.length; i += 3) {
@@ -290,6 +286,14 @@ export class ExportService {
       base64 += i + 2 < bytes.length ? chars[c & 63] : '=';
     }
     return base64;
+  }
+
+  private static binaryToArrayBuffer(binary: string): ArrayBuffer {
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 
   static async importFromExcel(): Promise<void> {
@@ -577,6 +581,40 @@ export class ExportService {
     
     result.push(current);
     return result;
+  }
+
+  private static arrayToCSV(data: any[][]): string {
+    return data.map(row => 
+      row.map(cell => {
+        const cellStr = String(cell);
+        // Escapar comillas y envolver en comillas si contiene comas
+        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+          return `"${cellStr.replace(/"/g, '""')}"`;
+        }
+        return cellStr;
+      }).join(',')
+    ).join('\n');
+  }
+
+  private static binaryToBase64(binary: string): string {
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    // Convertir a base64 manualmente
+    let base64 = '';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    for (let i = 0; i < bytes.length; i += 3) {
+      const a = bytes[i];
+      const b = i + 1 < bytes.length ? bytes[i + 1] : 0;
+      const c = i + 2 < bytes.length ? bytes[i + 2] : 0;
+      
+      base64 += chars[a >> 2];
+      base64 += chars[((a & 3) << 4) | (b >> 4)];
+      base64 += i + 1 < bytes.length ? chars[((b & 15) << 2) | (c >> 6)] : '=';
+      base64 += i + 2 < bytes.length ? chars[c & 63] : '=';
+    }
+    return base64;
   }
 
   private static base64ToBinary(base64: string): string {

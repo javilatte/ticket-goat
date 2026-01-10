@@ -152,7 +152,7 @@
 | [TypeScript](https://www.typescriptlang.org/) | Static type checking |
 | [AsyncStorage](https://react-native-async-storage.github.io/async-storage/) | Local data persistence |
 | [Expo Secure Store](https://docs.expo.dev/versions/latest/sdk/securestore/) | Encrypted key storage |
-| [XLSX](https://github.com/SheetJS/sheetjs) | Excel file generation |
+| [SheetJS CE](https://git.sheetjs.com/sheetjs/sheetjs) | Excel file generation |
 | [Axios](https://axios-http.com/) | HTTP client |
 | [React Native SVG](https://github.com/software-mansion/react-native-svg) | Charts and graphics |
 

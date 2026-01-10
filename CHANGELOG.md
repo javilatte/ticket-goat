@@ -5,6 +5,15 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-01-10
+
+### Security
+- **Actualizado a SheetJS Community Edition (xlsx@0.20.3)** para solucionar vulnerabilidades de seguridad
+  - Solucionado: Prototype Pollution en xlsx@0.18.5
+  - Solucionado: Regular Expression Denial of Service (ReDoS) en xlsx@0.18.5
+  - Migrado a versión actualizada desde https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+  - Compatible con React Native y Web sin problemas de stack overflow
+
 ## [1.1.0] - 2026-01-06
 
 ### Security Enhancement - Cifrado por Defecto
