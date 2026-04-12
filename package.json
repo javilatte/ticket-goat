@@ -12,7 +12,7 @@
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@types/crypto-js": "^4.2.2",
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
     "crypto-js": "^4.2.0",
     "expo": "~54.0.30",
     "expo-audio": "~1.1.1",
